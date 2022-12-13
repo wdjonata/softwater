@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Owner {
+  id        String      @id @default(uuid())
+  email     String      @unique
+  name      String
+  phone     Int
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  Flowmeter Flowmeter[]
+
+  @@map("owner")
+}
+
+model Address {
+  id        String     @id @default(uuid())
+  cep       Int
+  bairro    String
+  rua       String
+  numero    Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  flowmeter Flowmeter?
+
+  @@map("address")
+}
+
+model Flowmeter {
+  id         String   @id @default(uuid())
+  name       String
+  owner      Owner    @relation(fields: [owner_Id], references: [id])
+  owner_Id   String
+  address    Address  @relation(fields: [address_Id], references: [id])
+  address_Id String   @unique
+  Events     Events[]
+
+  @@map("flowmeter")
+}
+
+model Events {
+  id           String    @id @default(uuid())
+  consumption  Int
+  flowmeter    Flowmeter @relation(fields: [flowmeter_id], references: [id])
+  flowmeter_id String
+  createdAt    DateTime  @default(now())
+
+  @@map("events")
+}
